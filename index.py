@@ -1,17 +1,17 @@
-import random
+import string
+import secrets
 
 def get_int_input(prompt):
     while True:
-        value = input(prompt)
+        value = input(prompt).strip()
         if value.isdigit():
-            return int(value)
-        else:
-            print("Please enter a valid number.")
+            return int(value)            # non-negative integer
+        print("Please enter a valid number (0 or greater).")
 
-# Character pools
-letters = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-numbers = list('0123456789')
-symbols = list('!#$%&()*+')
+# Character pools 
+LETTERS = string.ascii_letters          # a-zA-Z
+DIGITS  = string.digits                 # 0-9
+SYMBOLS = "!#$%&()*+"
 
 print("Welcome to the PyPassword Generator!")
 
@@ -20,25 +20,18 @@ nr_letters = get_int_input("How many letters would you like in your password? ")
 nr_symbols = get_int_input("How many symbols would you like? ")
 nr_numbers = get_int_input("How many numbers would you like? ")
 
-# Build password components
-password_list = []
+# Define pools and their counts
+char_pools = [
+    (LETTERS, nr_letters),
+    (SYMBOLS, nr_symbols),
+    (DIGITS, nr_numbers)
+]
 
-# Add letters
-for _ in range(nr_letters):
-    password_list.append(random.choice(letters))
-
-# Add symbols
-for _ in range(nr_symbols):
-    password_list.append(random.choice(symbols))
-
-# Add numbers
-for _ in range(nr_numbers):
-    password_list.append(random.choice(numbers))
-
-# Shuffle the list
-random.shuffle(password_list)
+# Build password list (secure choice) and shuffle securely
+rng = secrets.SystemRandom()
+password_list = [rng.choice(pool) for pool, count in char_pools for _ in range(count)]
+rng.shuffle(password_list)
 
 # Convert list to string
 password = "".join(password_list)
-
 print(f"\nYour generated password is: {password}")
